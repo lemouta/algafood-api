@@ -10,6 +10,10 @@ import net.mouta.algafood.api.model.CozinhaModel;
 import net.mouta.algafood.api.model.input.CozinhaInput;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -44,8 +48,10 @@ public class CozinhaController {
 	private CozinhaInputDisassembler cozinhaInputDisassembler;
 
 	@GetMapping
-	public List<CozinhaModel> listar() {
-		return cozinhaModelAssembler.toCollectionModel(cozinhaRepository.findAll());
+	public Page<CozinhaModel> listar(@PageableDefault(size = 5) Pageable pageable) {
+		Page<Cozinha> cozinhasPage = cozinhaRepository.findAll(pageable);
+		List<CozinhaModel> cozinhasModel = cozinhaModelAssembler.toCollectionModel(cozinhasPage.getContent());
+		return new PageImpl<>(cozinhasModel, pageable, cozinhasPage.getTotalElements());
 	}
 	
 	@GetMapping(produces = MediaType.APPLICATION_XML_VALUE)

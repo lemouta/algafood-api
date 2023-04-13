@@ -1,9 +1,11 @@
 package net.mouta.algafood.api.controller;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import net.mouta.algafood.api.assembler.RestauranteInputDisassembler;
 import net.mouta.algafood.api.assembler.RestauranteModelAssembler;
 import net.mouta.algafood.api.model.RestauranteModel;
 import net.mouta.algafood.api.model.input.RestauranteInput;
+import net.mouta.algafood.api.model.view.RestauranteView;
 import net.mouta.algafood.domain.exception.CidadeNaoEncontradaException;
 import net.mouta.algafood.domain.exception.CozinhaNaoEncontradaException;
 import net.mouta.algafood.domain.exception.NegocioException;
@@ -34,9 +36,32 @@ public class RestauranteController {
 	@Autowired
 	private RestauranteInputDisassembler restauranteInputDisassembler;
 
+//	@GetMapping
+//	public MappingJacksonValue listar(@RequestParam(required = false) String projecao) {
+//		List<RestauranteModel> restaurantesModel = restauranteModelAssembler.toCollectionModel(restauranteRepository.findAll());
+//		MappingJacksonValue restaurantesWrapper = new MappingJacksonValue(restaurantesModel);
+//
+//		restaurantesWrapper.setSerializationView(RestauranteView.Resumo.class);
+//
+//		if ("apenas-nome".equals(projecao)) {
+//			restaurantesWrapper.setSerializationView(RestauranteView.ApenasNome.class);
+//		} else if ("completo".equals(projecao)) {
+//			restaurantesWrapper.setSerializationView(null);
+//		}
+//
+//		return restaurantesWrapper;
+//	}
+
+	@JsonView(RestauranteView.Resumo.class)
 	@GetMapping
 	public List<RestauranteModel> listar() {
 		return restauranteModelAssembler.toCollectionModel(restauranteRepository.findAll());
+	}
+
+	@JsonView(RestauranteView.ApenasNome.class)
+	@GetMapping(params = "projecao=apenas-nome")
+	public List<RestauranteModel> listarApenasNomes() {
+		return listar();
 	}
 
 	@GetMapping("/{restauranteId}")

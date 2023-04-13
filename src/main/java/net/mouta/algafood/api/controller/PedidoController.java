@@ -1,29 +1,27 @@
 package net.mouta.algafood.api.controller;
 
-import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.google.common.collect.ImmutableMap;
 import net.mouta.algafood.api.assembler.PedidoInputDisassembler;
 import net.mouta.algafood.api.assembler.PedidoModelAssembler;
 import net.mouta.algafood.api.assembler.PedidoResumoModelAssembler;
 import net.mouta.algafood.api.model.PedidoModel;
 import net.mouta.algafood.api.model.PedidoResumoModel;
 import net.mouta.algafood.api.model.input.PedidoInput;
+import net.mouta.algafood.core.data.PageableTranslator;
 import net.mouta.algafood.domain.exception.EntidadeNaoEncontradaException;
 import net.mouta.algafood.domain.exception.NegocioException;
 import net.mouta.algafood.domain.model.Pedido;
 import net.mouta.algafood.domain.model.Usuario;
 import net.mouta.algafood.domain.repository.PedidoRepository;
-import net.mouta.algafood.domain.repository.filter.PedidoFilter;
+import net.mouta.algafood.domain.filter.PedidoFilter;
 import net.mouta.algafood.domain.service.EmissaoPedidoService;
 import net.mouta.algafood.infrastructure.repository.spec.PedidoSpecs;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -50,9 +48,20 @@ public class PedidoController {
 
 	@GetMapping
 	public Page<PedidoResumoModel> listar(PedidoFilter filtro, @PageableDefault(size = 10) Pageable pageable) {
+		pageable = traduzirPageable(pageable);
 		Page<Pedido> pedidosPage = pedidoRepository.findAll(PedidoSpecs.usandoFiltro(filtro), pageable);
 		List<PedidoResumoModel> pedidosResumoModel = pedidoResumoModelAssembler.toCollectionModel(pedidosPage.getContent());
 		return new PageImpl<>(pedidosResumoModel, pageable, pedidosPage.getTotalElements());
+	}
+
+	private Pageable traduzirPageable(Pageable pageable) {
+		var mapeamento = ImmutableMap.of(
+				"codigo", "codigo",
+				"restaurante.nome", "restaurante.nome",
+				"nomeCliente", "cliente.nome",
+				"valorTotal", "valorTotal"
+		);
+		return PageableTranslator.translate(pageable, mapeamento);
 	}
 
 //	@GetMapping

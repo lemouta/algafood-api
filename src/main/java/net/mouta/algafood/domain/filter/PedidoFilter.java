@@ -1,4 +1,4 @@
-package net.mouta.algafood.domain.repository.filter;
+package net.mouta.algafood.domain.filter;
 
 import lombok.Getter;
 import lombok.Setter;

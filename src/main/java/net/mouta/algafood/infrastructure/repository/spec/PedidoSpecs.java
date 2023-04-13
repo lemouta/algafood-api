@@ -1,7 +1,7 @@
 package net.mouta.algafood.infrastructure.repository.spec;
 
 import net.mouta.algafood.domain.model.Pedido;
-import net.mouta.algafood.domain.repository.filter.PedidoFilter;
+import net.mouta.algafood.domain.filter.PedidoFilter;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.Predicate;
